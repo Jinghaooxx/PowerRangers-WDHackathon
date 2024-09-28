@@ -2,6 +2,9 @@ import joblib
 import pandas as pd
 
 class Game:
+    """
+    Game Class
+    """
     def __init__(self, name, cpu, ram, battery, latency):
         self.name = name
         self.cpu = cpu
@@ -10,6 +13,9 @@ class Game:
         self.latency = latency
 
     def handler(self):
+        """
+        Return the all the values of a game object
+        """
         input_data = pd.DataFrame({
             'CPU_Usage' : [self.cpu],
             'RAM_Usage' : [self.ram],
@@ -19,17 +25,28 @@ class Game:
         return input_data
     
 class Application:
+    """
+    Main Application
+    """
     def __init__(self):
         self.games_running = {}
         self.model = joblib.load('model10.pkl')
 
     def create_games_object(self, name, cpu, ram , battery, latency):
+        """
+        Create a new game object and predict the usage of the game
+        """
         new_game = Game(name=name, cpu=cpu, ram=ram, battery=battery, latency=latency)
         new_game_data = new_game.handler()
         pred_data = self.model.predict(new_game_data)
         self.games_running[new_game.name] = (new_game, pred_data)
 
     def display(self):
+        """
+        Display on the GPU usage of every game running in the system
+        When there a game requiring 30% GPU usage is running, the model will calculate the appropriate usage amount and allocate to it.
+        When there is more than one game running, it will balance the usage among those games to optimize the resource allocation.
+        """
         tab = "  "
         ret_val = "  Name  |  CPU_USAGE  | RAM_USAGE  |  BATTERY  |  LATENCY  |  GPU_USAGE  \n"
         games_running = self.games_running.values()
